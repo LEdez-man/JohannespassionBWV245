@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Nr. 7 Choral – O große Lieb</title>
+
+<script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+<script src="https://unpkg.com/@tonejs/midi"></script>
+
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+button { padding: 6px 12px; }
+.controls { margin-top: 20px; }
+label { margin-right: 10px; }
+input[type=range] { width: 150px; }
+</style>
+</head>
+<body>
+
+<h2>Nr. 7 Choral – O große Lieb</h2>
+
+<table>
+<thead>
+<tr>
+<th>Choral</th>
+<th>Tutti</th>
+<th>S</th>
+<th>A</th>
+<th>T</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nr. 7 Choral – O große Lieb</td>
+<td><button onclick="loadMidi('midi/07-Lieb-tutti.mid', true)">▶</button></td>
+<td><button onclick="loadMidi('midi/07-Lieb-S.mid', false)">▶</button></td>
+<td><button onclick="loadMidi('midi/07-Lieb-A.mid', false)">▶</button></td>
+<td><button onclick="loadMidi('midi/07-Lieb-T.mid', false)">▶</button></td>
+<td><button onclick="loadMidi('midi/07-Lieb-B.mid', false)">▶</button></td>
+</tr>
+</tbody>
+</table>
+
+<div class="controls">
+<button onclick="play()">Play</button>
+<button onclick="pause()">Pause</button>
+<button onclick="stop()">Stop</button>
+
+<br><br>
+
+<label>Tempo:
+<input type="range" min="40" max="200" value="100" id="tempo">
+</label>
+
+<label>Master:
+<input type="range" min="-40" max="0" value="-6" id="masterVol">
+</label>
+
+<h4>Einzelstimmen (nur Tutti)</h4>
+
+<label>S:
+<input type="range" min="-40" max="0" value="-6" id="volS">
+</label>
+
+<label>A:
+<input type="range" min="-40" max="0" value="-6" id="volA">
+</label>
+
+<label>T:
+<input type="range" min="-40" max="0" value="-6" id="volT">
+</label>
+
+<label>B:
+<input type="range" min="-40" max="0" value="-6" id="volB">
+</label>
+
+</div>
+
+<script>
+
+let midi;
+let isTutti = false;
+let parts = [];
+let synths = [];
+let started = false;
+
+const master = new Tone.Volume(-6).toDestination();
+
+async function loadMidi(url, tuttiMode) {
+    await Tone.start();
+    isTutti = tuttiMode;
+
+    if (parts.length) stop();
+
+    const response = await fetch(url);
+    const buffer = await response.arrayBuffer();
+    midi = new Midi(buffer);
+
+    synths = [];
+    parts = [];
+
+    midi.tracks.forEach((track, i) => {
+
+        const synth = new Tone.PolySynth(Tone.Synth).connect(master);
+        synths.push(synth);
+
+        const part = new Tone.Part((time, note) => {
+            synth.triggerAttackRelease(
+                note.name,
+                note.duration,
+                time,
+                note.velocity
+            );
+        }, track.notes.map(n => ({
+            time: n.time,
+            name: n.name,
+            duration: n.duration,
+            velocity: n.velocity
+        })));
+
+        part.start(0);
+        parts.push(part);
+    });
+
+    Tone.Transport.bpm.value = document.getElementById("tempo").value;
+}
+
+function play() {
+    if (!started) {
+        Tone.Transport.start();
+        started = true;
+    } else {
+        Tone.Transport.start();
+    }
+}
+
+function pause() {
+    Tone.Transport.pause();
+}
+
+function stop() {
+    Tone.Transport.stop();
+    Tone.Transport.position = 0;
+    started = false;
+}
+
+document.getElementById("tempo").addEventListener("input", e => {
+    Tone.Transport.bpm.value = e.target.value;
+});
+
+document.getElementById("masterVol").addEventListener("input", e => {
+    master.volume.value = e.target.value;
+});
+
+function setVoiceVolume(index, value) {
+    if (isTutti && synths[index]) {
