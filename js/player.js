@@ -1,22 +1,17 @@
 let midi = null;
 let isTutti = false;
-
-let synths = [];
 let parts = [];
-
+let synths = {};
 let masterVolume = new Tone.Volume(-6).toDestination();
 let isLoaded = false;
 
 /* ============================= */
 /* MIDI LADEN */
 /* ============================= */
-
 async function loadMidi(url, tuttiMode) {
+    await Tone.start(); // AudioContext aktivieren, falls noch suspended
 
-    await Tone.start();
-
-    stop(); // alles sauber zurücksetzen
-
+    stop(); // alles zurücksetzen
     isTutti = tuttiMode;
     isLoaded = false;
 
@@ -24,16 +19,19 @@ async function loadMidi(url, tuttiMode) {
     const arrayBuffer = await response.arrayBuffer();
     midi = new Midi(arrayBuffer);
 
-    synths = [];
     parts = [];
+    synths = {};
 
-    midi.tracks.forEach((track, index) => {
+    // Automatische Track-Zuordnung nach Name
+    midi.tracks.forEach(track => {
+        const name = track.name.trim(); // Track-Name aus MIDI
 
-        const synth = new Tone.PolySynth(Tone.Synth);
-        synth.connect(masterVolume);
+        // Nur S,A,T,B Tracks berücksichtigen
+        if (!['S','A','T','B'].includes(name)) return;
+
+        const synth = new Tone.PolySynth(Tone.Synth).connect(masterVolume);
         synth.volume.value = -6;
-
-        synths.push(synth);
+        synths[name] = synth;
 
         const part = new Tone.Part((time, note) => {
             synth.triggerAttackRelease(
@@ -53,8 +51,11 @@ async function loadMidi(url, tuttiMode) {
         parts.push(part);
     });
 
-    Tone.Transport.bpm.value = document.getElementById("tempo").value;
+    // Tempo einstellen
+    const tempoSlider = document.getElementById("tempo");
+    if (tempoSlider) Tone.Transport.bpm.value = tempoSlider.value;
 
+    // Transport stoppen, Position auf Anfang
     Tone.Transport.stop();
     Tone.Transport.position = 0;
 
@@ -64,9 +65,15 @@ async function loadMidi(url, tuttiMode) {
 /* ============================= */
 /* TRANSPORT STEUERUNG */
 /* ============================= */
-
-function play() {
+async function play() {
     if (!isLoaded) return;
+
+    // AudioContext aktivieren falls noch suspended
+    if (Tone.context.state !== 'running') {
+        await Tone.start();
+        console.log("AudioContext aktiviert!");
+    }
+
     Tone.Transport.start();
 }
 
@@ -78,17 +85,18 @@ function stop() {
     Tone.Transport.stop();
     Tone.Transport.position = 0;
 
+    // Teile und Synths löschen
     parts.forEach(p => p.dispose());
-    synths.forEach(s => s.dispose());
+    for (const key in synths) synths[key].dispose();
 
     parts = [];
-    synths = [];
+    synths = {};
+    isLoaded = false;
 }
 
 /* ============================= */
-/* TEMPO */
+/* TEMPO-REGELUNG */
 /* ============================= */
-
 const tempoSlider = document.getElementById("tempo");
 if (tempoSlider) {
     tempoSlider.addEventListener("input", e => {
@@ -99,7 +107,6 @@ if (tempoSlider) {
 /* ============================= */
 /* MASTER VOLUME */
 /* ============================= */
-
 const masterSlider = document.getElementById("masterVol");
 if (masterSlider) {
     masterSlider.addEventListener("input", e => {
@@ -110,12 +117,9 @@ if (masterSlider) {
 /* ============================= */
 /* EINZELSTIMMEN (nur Tutti) */
 /* ============================= */
-
-function setVoiceVolume(index, value) {
+function setVoiceVolume(trackName, value) {
     if (!isTutti) return;
-    if (synths[index]) {
-        synths[index].volume.value = value;
-    }
+    if (synths[trackName]) synths[trackName].volume.value = value;
 }
 
 const volS = document.getElementById("volS");
@@ -123,7 +127,7 @@ const volA = document.getElementById("volA");
 const volT = document.getElementById("volT");
 const volB = document.getElementById("volB");
 
-if (volS) volS.addEventListener("input", e => setVoiceVolume(0, e.target.value));
-if (volA) volA.addEventListener("input", e => setVoiceVolume(1, e.target.value));
-if (volT) volT.addEventListener("input", e => setVoiceVolume(2, e.target.value));
-if (volB) volB.addEventListener("input", e => setVoiceVolume(3, e.target.value));
+if (volS) volS.addEventListener("input", e => setVoiceVolume('S', e.target.value));
+if (volA) volA.addEventListener("input", e => setVoiceVolume('A', e.target.value));
+if (volT) volT.addEventListener("input", e => setVoiceVolume('T', e.target.value));
+if (volB) volB.addEventListener("input", e => setVoiceVolume('B', e.target.value));
