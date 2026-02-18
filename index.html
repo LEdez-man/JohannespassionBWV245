@@ -8,40 +8,110 @@
 <title>Choräle - Johannespassion BWV 245, Für den Chor der Pauluskirchgemeinde</title>
 
 <style>
+:root {
+    --bg: #faf7f2;
+    --card: #ffffff;
+    --border: #e8e0d0;
+    --header-bg: #2c1f14;
+    --header-fg: #f5ede0;
+    --accent: #8b5e3c;
+    --s-color: #5b3fa0;
+    --a-color: #b07d2e;
+    --t-color: #c0522a;
+    --b-color: #2a5e8c;
+    --text: #2c1f14;
+    --lyrics-bg: #fdf9f4;
+    --lyrics-border: #c9a96e;
+}
+
+* { box-sizing: border-box; }
+
 body {
     font-family: system-ui, -apple-system, sans-serif;
     margin: 0;
-    padding: 16px;
-    background: #f5f5f5;
+    padding: 24px 16px 48px;
+    background: var(--bg);
+    color: var(--text);
+}
+
+header {
+    max-width: 860px;
+    margin: 0 auto 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 16px;
 }
 
 h1 {
-    font-size: 1.2rem;
-    margin-bottom: 16px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.5rem;
+    font-weight: normal;
+    margin: 0 0 4px;
+    letter-spacing: 0.02em;
+}
+
+header p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #7a6a58;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.table-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(44, 31, 20, 0.1);
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: var(--card);
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
+thead tr {
+    background: var(--header-bg);
+    color: var(--header-fg);
+}
+
+th {
+    padding: 12px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+th:nth-child(2) { color: #c4b0e8; }
+th:nth-child(3) { color: #f0d090; }
+th:nth-child(4) { color: #f0a880; }
+th:nth-child(5) { color: #90c0e8; }
+
+td {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 8px;
     text-align: center;
     vertical-align: middle;
 }
 
-th {
-    background: #efefef;
+td:first-child {
+    font-family: Georgia, serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: bold;
+    width: 48px;
 }
 
-/* Audio Player Vergrößerung */
+tbody tr[data-nr]:hover td {
+    background: #fdf5ec;
+}
+
 audio {
-    width: 100%;         /* volle Breite der Zelle */
-    max-width: none;     /* keine maximale Breite */
-    height: 32px;        /* etwas höhere Player-Höhe für Slider */
+    width: 100%;
+    height: 32px;
 }
 
 /* Liedtext */
@@ -49,10 +119,15 @@ audio {
 .lyrics-row.active { display: table-row; }
 .lyrics-row td {
     text-align: left;
+    font-family: Georgia, "Times New Roman", serif;
     font-style: italic;
-    color: #555;
-    line-height: 1.7;
-    border-top: none;
+    font-size: 0.95rem;
+    color: #4a3828;
+    line-height: 1.9;
+    background: var(--lyrics-bg);
+    border-left: 3px solid var(--lyrics-border);
+    border-bottom: 2px solid var(--border);
+    padding: 16px 20px;
 }
 
 /* Mobile Optimierung */
@@ -61,34 +136,41 @@ audio {
         display: block;
     }
 
-    thead {
-        display: none;
-    }
+    thead { display: none; }
 
-    tr {
-        margin-bottom: 14px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        background: white;
+    tbody tr[data-nr] {
+        margin-bottom: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 1px 6px rgba(44, 31, 20, 0.08);
+        border: 1px solid var(--border);
     }
 
     td {
         border: none;
+        border-bottom: 1px solid var(--border);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 6px 0;
+        padding: 8px 12px;
     }
 
-    td::before {
-        font-weight: bold;
+    td:first-child {
+        background: var(--header-bg);
+        color: var(--header-fg);
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        justify-content: flex-start;
+        gap: 8px;
+        width: auto;
     }
 
-    td:nth-child(1)::before { content: "Nr."; }
-    td:nth-child(2)::before { content: "S"; }
-    td:nth-child(3)::before { content: "A"; }
-    td:nth-child(4)::before { content: "T"; }
-    td:nth-child(5)::before { content: "B"; }
+    td:first-child::before { content: "Nr."; opacity: 0.6; font-family: system-ui; font-size: 0.75rem; }
+    td:nth-child(2)::before { content: "S"; font-weight: bold; color: var(--s-color); }
+    td:nth-child(3)::before { content: "A"; font-weight: bold; color: var(--a-color); }
+    td:nth-child(4)::before { content: "T"; font-weight: bold; color: var(--t-color); }
+    td:nth-child(5)::before { content: "B"; font-weight: bold; color: var(--b-color); }
 
     .lyrics-row.active {
         display: block;
@@ -116,16 +198,20 @@ audio {
     }
 
     audio {
-        width: 100%;     /* auf Mobilgerät volle Breite */
-        height: 36px;    /* etwas größer für Touchbedienung */
+        width: 100%;
+        height: 36px;
     }
 }
 </style>
 </head>
 <body>
 
-<h1>Choräle - Johannespassion BWV 245, UA: 7.4.1724</h1>
+<header>
+<h1>Choräle · Johannespassion BWV 245</h1>
+<p>Johann Sebastian Bach · Uraufführung 7. April 1724</p>
+</header>
 
+<div class="table-wrap">
 <table>
 <thead>
 <tr>
@@ -239,6 +325,7 @@ audio {
 
 </tbody>
 </table>
+</div>
 
 <script src="lyrics.js"></script>
 <script>
