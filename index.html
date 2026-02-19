@@ -499,6 +499,7 @@ function updateVoiceUI() {
 
 autoplayCheckbox.addEventListener("change", () => {
     localStorage.setItem("voiceAutoplay", autoplayCheckbox.checked);
+    cancelAutoPlay();
     updateVoiceUI();
 });
 
@@ -506,6 +507,7 @@ voiceButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         preferredVoice = btn.dataset.voice === preferredVoice ? "" : btn.dataset.voice;
         localStorage.setItem("preferredVoice", preferredVoice);
+        cancelAutoPlay();
         updateVoiceUI();
     });
 });
@@ -514,18 +516,27 @@ updateVoiceUI();
 
 // Auto-play beim Öffnen des Notenblatts
 let autoPlayTimer = null;
+
+function cancelAutoPlay() {
+    if (autoPlayTimer) {
+        clearTimeout(autoPlayTimer);
+        autoPlayTimer = null;
+    }
+}
+
 document.querySelectorAll("td:first-child a").forEach(link => {
     link.addEventListener("click", () => {
+        cancelAutoPlay();
         if (!preferredVoice || !autoplayCheckbox.checked) return;
         const row = link.closest("tr[data-nr]");
         if (!row) return;
         const audios = row.querySelectorAll("audio");
         const audio = audios[VOICE_IDX[preferredVoice]];
-        if (!audio) return;
-        if (autoPlayTimer) clearTimeout(autoPlayTimer);
+        if (!audio || !audio.src) return;
         autoPlayTimer = setTimeout(() => {
             players.forEach(p => { if (p !== audio) p.pause(); });
-            audio.play();
+            audio.play().catch(() => {}); // Ignore if play fails
+            autoPlayTimer = null;
         }, 3000);
     });
 });
