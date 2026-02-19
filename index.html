@@ -171,6 +171,57 @@ audio {
     padding: 16px 20px;
 }
 
+/* Stimmenwahl */
+.voice-pref {
+    max-width: 860px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    color: #7a6a58;
+    flex-wrap: wrap;
+}
+
+.voice-btn {
+    border: 2px solid transparent;
+    border-radius: 6px;
+    padding: 4px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--card);
+    letter-spacing: 0.05em;
+    line-height: 1.6;
+    transition: background 0.15s, color 0.15s;
+}
+
+.voice-btn[data-voice="S"] { color: var(--s-color); border-color: var(--s-color); }
+.voice-btn[data-voice="A"] { color: var(--a-color); border-color: var(--a-color); }
+.voice-btn[data-voice="T"] { color: var(--t-color); border-color: var(--t-color); }
+.voice-btn[data-voice="B"] { color: var(--b-color); border-color: var(--b-color); }
+
+.voice-btn[data-voice="S"].active { background: var(--s-color); color: #fff; }
+.voice-btn[data-voice="A"].active { background: var(--a-color); color: #fff; }
+.voice-btn[data-voice="T"].active { background: var(--t-color); color: #fff; }
+.voice-btn[data-voice="B"].active { background: var(--b-color); color: #fff; }
+
+.voice-autoplay-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: #7a6a58;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+.voice-pref-hint {
+    font-size: 0.8rem;
+    color: #9a8a78;
+    font-style: italic;
+}
+
 /* Mobile Optimierung */
 @media (max-width: 768px) {
     table, thead, tbody, th, td, tr {
@@ -253,6 +304,19 @@ audio {
 </header>
 
 <p style="max-width: 860px; margin: 0 auto 16px; font-size: 0.9rem; color: #7a6a58;">💡 Tipp: Auf die Choralnummer klicken, um das Notenblatt (PDF) zu öffnen.</p>
+
+<div class="voice-pref" role="group" aria-label="Bevorzugte Stimme auswählen">
+    <span>Meine Stimme:</span>
+    <button class="voice-btn" data-voice="S" aria-pressed="false">S</button>
+    <button class="voice-btn" data-voice="A" aria-pressed="false">A</button>
+    <button class="voice-btn" data-voice="T" aria-pressed="false">T</button>
+    <button class="voice-btn" data-voice="B" aria-pressed="false">B</button>
+    <label class="voice-autoplay-label">
+        <input type="checkbox" id="voice-autoplay">
+        Autoplay
+    </label>
+    <span class="voice-pref-hint" id="voice-pref-hint"></span>
+</div>
 
 <main class="table-wrap">
 <table>
@@ -407,6 +471,62 @@ players.forEach(player => {
         document.querySelectorAll(".lyrics-row").forEach(row => {
             row.classList.toggle("active", row.dataset.for === activeNr);
         });
+    });
+});
+
+// Stimmenpräferenz
+const VOICE_IDX = { S: 0, A: 1, T: 2, B: 3 };
+const VOICE_LABEL = { S: "Sopran", A: "Alt", T: "Tenor", B: "Bass" };
+let preferredVoice = localStorage.getItem("preferredVoice") || "";
+const voiceButtons = document.querySelectorAll(".voice-btn");
+const voicePrefHint = document.getElementById("voice-pref-hint");
+const autoplayCheckbox = document.getElementById("voice-autoplay");
+
+// Default is enabled; only store when explicitly unchecked
+autoplayCheckbox.checked = localStorage.getItem("voiceAutoplay") !== "false";
+
+function updateVoiceUI() {
+    voiceButtons.forEach(btn => {
+        const active = btn.dataset.voice === preferredVoice;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", String(active));
+    });
+    const autoplayOn = autoplayCheckbox.checked;
+    voicePrefHint.textContent = preferredVoice && autoplayOn
+        ? "→ Beim Öffnen des Notenblatts startet " + VOICE_LABEL[preferredVoice] + " nach 3 s"
+        : "";
+}
+
+autoplayCheckbox.addEventListener("change", () => {
+    localStorage.setItem("voiceAutoplay", autoplayCheckbox.checked);
+    updateVoiceUI();
+});
+
+voiceButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        preferredVoice = btn.dataset.voice === preferredVoice ? "" : btn.dataset.voice;
+        localStorage.setItem("preferredVoice", preferredVoice);
+        updateVoiceUI();
+    });
+});
+
+updateVoiceUI();
+
+// Auto-play beim Öffnen des Notenblatts
+let autoPlayTimer = null;
+document.querySelectorAll("td:first-child a").forEach(link => {
+    link.addEventListener("click", () => {
+        if (!preferredVoice || !autoplayCheckbox.checked) return;
+        const row = link.closest("tr[data-nr]");
+        if (!row) return;
+        const audios = row.querySelectorAll("audio");
+        const audio = audios[VOICE_IDX[preferredVoice]];
+        if (!audio) return;
+        if (autoPlayTimer) clearTimeout(autoPlayTimer);
+        autoPlayTimer = setTimeout(() => {
+            players.forEach(p => { if (p !== audio) p.pause(); });
+            audio.play();
+        }, 3000);
     });
 });
 </script>
