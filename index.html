@@ -538,7 +538,7 @@ function updateVoiceUI() {
     });
     const autoplayOn = autoplayCheckbox.checked;
     voicePrefHint.textContent = preferredVoice && autoplayOn
-        ? "→ Beim Öffnen des Notenblatts startet " + VOICE_LABEL[preferredVoice] + " nach 3 s"
+        ? "→ Beim Öffnen des Notenblatts startet " + VOICE_LABEL[preferredVoice] + " nach 3\u00a0Sekunden"
         : "";
 }
 
