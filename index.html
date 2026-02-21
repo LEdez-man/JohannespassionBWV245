@@ -38,6 +38,25 @@
     border-width: 0;
 }
 
+.sr-only-focusable:focus-visible {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 8px 16px;
+    margin: 0 auto 8px;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    display: block;
+    max-width: 860px;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
 body {
     font-family: system-ui, -apple-system, sans-serif;
     margin: 0;
@@ -136,8 +155,10 @@ td:first-child a {
     -webkit-tap-highlight-color: transparent;
 }
 
-td:first-child a:focus {
-    outline: none;
+td:first-child a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -205,6 +226,17 @@ audio {
 .voice-btn[data-voice="A"].active { background: var(--a-color); color: #fff; }
 .voice-btn[data-voice="T"].active { background: var(--t-color); color: #fff; }
 .voice-btn[data-voice="B"].active { background: var(--b-color); color: #fff; }
+
+.voice-btn:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
+.voice-autoplay-label:focus-within {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
 
 .voice-autoplay-label {
     display: flex;
@@ -298,27 +330,29 @@ audio {
 </head>
 <body>
 
+<a href="#main-content" class="sr-only sr-only-focusable">Zur Choralliste springen</a>
+
 <header>
 <h1>Choräle · Johannespassion BWV 245</h1>
-<p>Johann Sebastian Bach · Uraufführung 7. April 1724</p>
+<p>Johann Sebastian Bach · Uraufführung <time datetime="1724-04-07" aria-label="7. April 1724">7. April 1724</time></p>
 </header>
 
 <p style="max-width: 860px; margin: 0 auto 16px; font-size: 0.9rem; color: #7a6a58;">💡 Tipp: Auf die Choralnummer klicken, um das Notenblatt (PDF) zu öffnen.</p>
 
 <div class="voice-pref" role="group" aria-label="Bevorzugte Stimme auswählen">
     <span>Meine Stimme:</span>
-    <button class="voice-btn" data-voice="S" aria-pressed="false">S</button>
-    <button class="voice-btn" data-voice="A" aria-pressed="false">A</button>
-    <button class="voice-btn" data-voice="T" aria-pressed="false">T</button>
-    <button class="voice-btn" data-voice="B" aria-pressed="false">B</button>
+    <button class="voice-btn" data-voice="S" aria-pressed="false" aria-label="Sopran">S</button>
+    <button class="voice-btn" data-voice="A" aria-pressed="false" aria-label="Alt">A</button>
+    <button class="voice-btn" data-voice="T" aria-pressed="false" aria-label="Tenor">T</button>
+    <button class="voice-btn" data-voice="B" aria-pressed="false" aria-label="Bass">B</button>
     <label class="voice-autoplay-label">
         <input type="checkbox" id="voice-autoplay">
         Autoplay
     </label>
-    <span class="voice-pref-hint" id="voice-pref-hint"></span>
+    <span class="voice-pref-hint" id="voice-pref-hint" aria-live="polite"></span>
 </div>
 
-<main class="table-wrap">
+<main id="main-content">
 <table>
 <caption class="sr-only">Choräle aus der Johannespassion BWV 245 nach Stimmen (Sopran, Alt, Tenor, Bass)</caption>
 <thead>
@@ -436,7 +470,7 @@ audio {
 </main>
 
 <footer>
-    <p>Die Johannespassion BWV 245 wurde am <strong>7. April 1724</strong> in der Thomaskirche Leipzig uraufgeführt — Bachs erstes großes Passionswerk als Thomaskantor.</p>
+    <p>Die Johannespassion BWV 245 wurde am <strong><time datetime="1724-04-07" aria-label="7. April 1724">7. April 1724</time></strong> in der Thomaskirche Leipzig uraufgeführt — Bachs erstes großes Passionswerk als Thomaskantor.</p>
     <p>Das Werk gliedert sich in Rezitative, Arien, Chöre und Choräle. <strong>Nr. 1 ist der Eingangschor</strong> („Herr, unser Herrscher“); der erste Choral erscheint erst als Nr. 7 („O große Lieb“). Die Lücken in der Nummerierung — also fehlende Nummern zwischen den Chorälen — sind keine Auslassungen, sondern Rezitative, Arien und Chöre.</p>
     <p>Die Nummern folgen der <strong>Bach-Gesellschaft-Ausgabe (BG)</strong>, der historischen Gesamtausgabe, und stimmen mit den meisten gedruckten Partituren überein.</p>
     <p>Notenblätter: <a href="https://tobis-notenarchiv.de/wp/en/bach-archive/vocal-works/passions/st-john-passion/" target="_blank" rel="noopener noreferrer">Tobis Notenarchiv</a>, lizenziert unter <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC 4.0</a>.</p>
@@ -444,13 +478,22 @@ audio {
 
 <script src="lyrics.js"></script>
 <script>
-// Inject lyrics rows from lyrics.js into the table
+// Inject lyrics rows and enrich PDF links with chorale title
 document.querySelectorAll("tr[data-nr]").forEach(row => {
     const nr = Number(row.dataset.nr);
     if (!LYRICS[nr]) return;
+
+    const incipit = LYRICS[nr].split("\n")[0].replace(/,$/, "");
+    const link = row.cells[0].querySelector("a");
+    if (link) {
+        link.setAttribute("aria-label", link.getAttribute("aria-label").replace(" – Notenblatt", ` \u201e${incipit}\u201c – Notenblatt`));
+        link.title = incipit;
+    }
+
     const lyricsRow = document.createElement("tr");
     lyricsRow.className = "lyrics-row";
     lyricsRow.dataset.for = String(nr);
+    lyricsRow.setAttribute("aria-hidden", "true");
     const td = document.createElement("td");
     td.colSpan = 5;
     td.innerHTML = LYRICS[nr].replaceAll("\n", "<br>");
@@ -469,7 +512,9 @@ players.forEach(player => {
         const activeRow = player.closest("tr[data-nr]");
         const activeNr = activeRow && activeRow.dataset.nr;
         document.querySelectorAll(".lyrics-row").forEach(row => {
-            row.classList.toggle("active", row.dataset.for === activeNr);
+            const isActive = row.dataset.for === activeNr;
+            row.classList.toggle("active", isActive);
+            row.setAttribute("aria-hidden", String(!isActive));
         });
     });
 });
