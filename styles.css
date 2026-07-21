@@ -6,12 +6,11 @@
     --header-fg: #f5ede0;
     --accent: #8b5e3c;
     --s-color: #5b3fa0;
-    --a-color: #b07d2e;
+    --a-color: #8a601f;
     --t-color: #c0522a;
     --b-color: #2a5e8c;
     --text: #2c1f14;
     --muted: #7a6a58;
-    --muted-light: #9a8a78;
     --hover-bg: #fdf5ec;
     --lyrics-bg: #fdf9f4;
     --lyrics-border: #c9a96e;
@@ -260,7 +259,7 @@ audio {
 
 .voice-pref-hint {
     font-size: 0.8rem;
-    color: var(--muted-light);
+    color: var(--muted);
     font-style: italic;
 }
 
