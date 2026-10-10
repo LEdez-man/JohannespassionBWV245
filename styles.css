@@ -157,6 +157,15 @@ td:first-child a {
     border-radius: 2px;
 }
 
+/* Trefferfläche mindestens 44px, ohne das Aussehen zu ändern */
+:is(td:first-child, .focus-link-bar) a { position: relative; }
+
+:is(td:first-child, .focus-link-bar) a::after {
+    content: "";
+    position: absolute;
+    inset: min(0px, (100% - 44px) / 2);
+}
+
 @media (hover: hover) and (pointer: fine) {
     td:first-child a:hover {
         opacity: 0.7;
@@ -260,6 +269,11 @@ audio {
     font-size: 0.8rem;
     color: var(--muted);
     font-style: italic;
+}
+
+@media (pointer: coarse) {
+    .voice-btn,
+    .voice-autoplay-label { min-block-size: 44px; }
 }
 
 /* Fokus-Link-Bar */
