@@ -270,26 +270,17 @@ audio {
     color: var(--muted);
 }
 
-/* Fokus-Modus: alle 4 Audio-Spalten verstecken */
-table[data-voice] :is(td, th):nth-child(n+2) { display: none; }
-
-/* Nur die gewählte Spalte einblenden */
-table[data-voice="S"] :is(td, th):nth-child(2) { display: table-cell; }
-table[data-voice="A"] :is(td, th):nth-child(3) { display: table-cell; }
-table[data-voice="T"] :is(td, th):nth-child(4) { display: table-cell; }
-table[data-voice="B"] :is(td, th):nth-child(5) { display: table-cell; }
+/* Fokus-Modus: die drei nicht gewählten Stimmen ausblenden */
+table[data-voice="S"] :is(td, th):is(:nth-child(3), :nth-child(4), :nth-child(5)),
+table[data-voice="A"] :is(td, th):is(:nth-child(2), :nth-child(4), :nth-child(5)),
+table[data-voice="T"] :is(td, th):is(:nth-child(2), :nth-child(3), :nth-child(5)),
+table[data-voice="B"] :is(td, th):is(:nth-child(2), :nth-child(3), :nth-child(4)) { display: none; }
 
 /* Mobile Optimierung */
 @media (max-width: 768px) {
     table, thead, tbody, th, td, tr {
         display: block;
     }
-
-    /* Fokus-Modus: sichtbare Spalte wieder als flex darstellen */
-    table[data-voice="S"] td:nth-child(2),
-    table[data-voice="A"] td:nth-child(3),
-    table[data-voice="T"] td:nth-child(4),
-    table[data-voice="B"] td:nth-child(5) { display: flex; }
 
     /* Fokus-Modus: Stimmen-Label ausblenden (nur eine Stimme sichtbar) */
     table[data-voice] td:not(:first-child)::before { content: none; }
