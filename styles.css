@@ -167,6 +167,8 @@ td:first-child a {
     }
 }
 
+td:first-child a:active { opacity: 0.5; }
+
 audio {
     width: 100%;
     height: 32px;
@@ -228,6 +230,12 @@ audio {
 
 .voice-btn { color: var(--voice); border-color: var(--voice); }
 .voice-btn[aria-pressed="true"] { background: var(--voice); color: #fff; outline-color: var(--voice); }
+
+.voice-btn:active { scale: 0.97; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .voice-btn { transition: background 0.15s, color 0.15s, scale 0.16s ease-out; }
+}
 
 /* Fokusring um das ganze Label statt nur um die Checkbox */
 .voice-autoplay-label:has(:focus-visible) {
