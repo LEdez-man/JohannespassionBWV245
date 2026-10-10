@@ -265,6 +265,8 @@ audio {
     margin-left: 4px;
 }
 
+.voice-autoplay-label input { accent-color: var(--accent); }
+
 .voice-pref-hint {
     font-size: 0.8rem;
     color: var(--muted);
