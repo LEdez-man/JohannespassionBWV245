@@ -242,9 +242,7 @@ function voiceTh(v) { return document.querySelector(`thead th:nth-child(${VOICES
 
 function updateVoiceUI() {
     voiceButtons.forEach(btn => {
-        const active = btn.dataset.voice === preferredVoice;
-        btn.classList.toggle("active", active);
-        btn.setAttribute("aria-pressed", String(active));
+        btn.setAttribute("aria-pressed", String(btn.dataset.voice === preferredVoice));
     });
     const autoplayOn = autoplayCheckbox.checked;
     const repeatOn = repeatCheckbox.checked;
