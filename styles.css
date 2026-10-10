@@ -36,12 +36,11 @@
     width: auto;
     height: auto;
     padding: 8px 16px;
-    margin: 0 auto 8px;
+    margin: 0 0 8px;
     overflow: visible;
     clip: auto;
     white-space: normal;
     display: block;
-    max-width: 860px;
     background: var(--accent);
     color: #fff;
     text-decoration: none;
@@ -54,20 +53,21 @@ body {
     font-family: system-ui, -apple-system, sans-serif;
     margin: 0;
     padding: 24px 16px 48px;
+    display: grid;
+    grid-template-columns: minmax(0, 860px);
+    justify-content: center;
     background: var(--bg);
     color: var(--text);
 }
 
 .tip-text {
-    max-width: 860px;
-    margin: 0 auto 16px;
+    margin: 0 0 16px;
     font-size: 0.9rem;
     color: var(--muted);
 }
 
 header {
-    max-width: 860px;
-    margin: 0 auto 28px;
+    margin-block-end: 28px;
     border-bottom: 2px solid var(--accent);
     padding-bottom: 16px;
 }
@@ -89,8 +89,7 @@ header p {
 }
 
 footer {
-    max-width: 860px;
-    margin: 40px auto 0;
+    margin-block-start: 40px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
     font-size: 0.82rem;
@@ -102,8 +101,6 @@ footer p { margin: 0 0 0.5em; }
 footer p:last-child { margin-bottom: 0; }
 
 main {
-    max-width: 860px;
-    margin: 0 auto;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 16px rgb(44 31 20 / 0.1);
@@ -194,8 +191,7 @@ audio {
 
 /* Stimmenwahl */
 .voice-pref {
-    max-width: 860px;
-    margin: 0 auto 12px;
+    margin: 0 0 12px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -263,8 +259,7 @@ audio {
 
 /* Fokus-Link-Bar */
 .focus-link-bar {
-    max-width: 860px;
-    margin: -16px auto 10px;
+    margin: -16px 0 10px;
     font-size: 0.85rem;
     text-align: right;
     color: var(--muted);
