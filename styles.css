@@ -141,7 +141,7 @@ td {
     vertical-align: middle;
 }
 
-td:first-child {
+tr[data-nr] > td:first-child {
     font-family: Georgia, serif;
     font-size: 1.1rem;
     color: var(--accent);
@@ -313,7 +313,7 @@ table[data-voice="B"] :is(td, th):nth-child(5) { display: table-cell; }
         padding: 8px 12px;
     }
 
-    td:first-child {
+    tr[data-nr] > td:first-child {
         background: var(--header-bg);
         color: var(--header-fg);
         font-size: 0.85rem;
@@ -324,7 +324,7 @@ table[data-voice="B"] :is(td, th):nth-child(5) { display: table-cell; }
         width: auto;
     }
 
-    td:first-child::before { content: "Nr."; opacity: 0.6; font-family: system-ui; font-size: 0.75rem; }
+    tr[data-nr] > td:first-child::before { content: "Nr."; opacity: 0.6; font-family: system-ui; font-size: 0.75rem; }
     td:nth-child(2)::before { content: "S"; font-weight: bold; color: var(--s-color); }
     td:nth-child(3)::before { content: "A"; font-weight: bold; color: var(--a-color); }
     td:nth-child(4)::before { content: "T"; font-weight: bold; color: var(--t-color); }
@@ -335,25 +335,7 @@ table[data-voice="B"] :is(td, th):nth-child(5) { display: table-cell; }
         margin-bottom: 12px;
     }
 
-    tr.lyrics-row > td {
-        display: block;
-        width: auto;
-        border-left: 3px solid var(--lyrics-border);
-        background: var(--lyrics-bg);
-        color: var(--lyrics-text);
-        text-transform: none;
-        font-family: Georgia, "Times New Roman", serif;
-        font-style: italic;
-        font-size: 0.95rem;
-        font-weight: normal;
-        letter-spacing: normal;
-        line-height: 1.9;
-        padding: 16px 20px;
-    }
-
-    tr.lyrics-row > td::before {
-        content: none !important;
-    }
+    .lyrics-row td { display: block; }
 
     audio {
         width: 100%;
